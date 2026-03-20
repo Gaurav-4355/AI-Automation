@@ -9,8 +9,11 @@ const InputHub = ({ onProcessed }) => {
   const [file, setFile] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [isHandsFree, setIsHandsFree] = useState(false);
+  const [isNovaActive, setIsNovaActive] = useState(false);
   const recognitionRef = useRef(null);
   const fileInputRef = useRef(null);
+  const autoSubmitTimeoutRef = useRef(null);
 
   const handleFileChange = (e) => {
     const droppedFile = e.target.files[0];
@@ -23,64 +26,14 @@ const InputHub = ({ onProcessed }) => {
     }
   };
 
-  const handleVoiceInput = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("Voice recognition is not supported in this browser.");
-      return;
-    }
-
-    if (isRecording) {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
-      setIsRecording(false);
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-
-    recognition.onstart = () => {
-      console.log("DEBUG: Voice recording started");
-      setIsRecording(true);
-    };
-
-    recognition.onresult = (event) => {
-      let finalTranscript = '';
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript + ' ';
-        }
-      }
-      if (finalTranscript) {
-        setContent(prev => prev + finalTranscript);
-      }
-    };
-
-    recognition.onerror = (event) => {
-      console.error("DEBUG: Voice recognition error:", event.error);
-      setIsRecording(false);
-    };
-
-    recognition.onend = () => {
-      console.log("DEBUG: Voice recording ended");
-      setIsRecording(false);
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
-  };
-
-  const handleSubmit = async () => {
-    if (!content && !file) {
+  const handleSubmit = async (overrideContent = null) => {
+    const finalContent = typeof overrideContent === 'string' ? overrideContent : content;
+    if (!finalContent && !file) {
       console.warn("DEBUG: No content or file to submit");
       return;
     }
 
-    console.log("DEBUG: Starting submission...", { inputType, hasContent: !!content, hasFile: !!file });
+    console.log("DEBUG: Starting submission...", { inputType, hasContent: !!finalContent, hasFile: !!file });
     setIsProcessing(true);
     const formData = new FormData();
     formData.append('input_type', inputType);
@@ -88,8 +41,8 @@ const InputHub = ({ onProcessed }) => {
     if (file) {
       formData.append('file', file);
     }
-    if (content) {
-      formData.append('raw_content', content);
+    if (finalContent) {
+      formData.append('raw_content', finalContent);
     }
 
     try {
@@ -100,15 +53,106 @@ const InputHub = ({ onProcessed }) => {
       console.log("DEBUG: Backend response received:", response.data);
       setContent('');
       setFile(null);
-      onProcessed();
+      if (onProcessed) onProcessed();
+      
+      // Voice feedback for Hands-Free mode
+      if (isHandsFree && 'speechSynthesis' in window) {
+        const msg = new SpeechSynthesisUtterance("Task processed successfully, bhai!");
+        window.speechSynthesis.speak(msg);
+      }
     } catch (error) {
       console.error("DEBUG: Error processing input:", error);
-      if (error.response) {
-        console.error("DEBUG: Error response data:", error.response.data);
-      }
       alert(`Failed to process input: ${error.message}`);
     } finally {
       setIsProcessing(false);
+      setIsNovaActive(false);
+    }
+  };
+
+  const handleVoiceInput = (handsFreeMode = false) => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Voice recognition is not supported in this browser.");
+      return;
+    }
+
+    if (isRecording && !handsFreeMode) {
+      if (recognitionRef.current) recognitionRef.current.stop();
+      setIsRecording(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = handsFreeMode;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      console.log(`DEBUG: Voice recording started (Hands-Free: ${handsFreeMode})`);
+      setIsRecording(true);
+    };
+
+    recognition.onresult = (event) => {
+      let currentTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        currentTranscript += event.results[i][0].transcript;
+      }
+
+      const lowerTranscript = currentTranscript.toLowerCase();
+      
+      if (handsFreeMode) {
+        if (lowerTranscript.includes("hey nova")) {
+          if (!isNovaActive) {
+            setIsNovaActive(true);
+            console.log("DEBUG: WAKE WORD DETECTED: Hey Nova");
+          }
+          
+          const command = currentTranscript.split(/hey nova/i)[1]?.trim();
+          if (command) {
+            setContent(command);
+            
+            // Auto-submit after 2.5 seconds of silence after the command
+            if (autoSubmitTimeoutRef.current) clearTimeout(autoSubmitTimeoutRef.current);
+            autoSubmitTimeoutRef.current = setTimeout(() => {
+              console.log("DEBUG: Auto-submitting command:", command);
+              handleSubmit(command);
+            }, 2500);
+          }
+        }
+      } else {
+        setContent(currentTranscript);
+      }
+    };
+
+    recognition.onerror = (event) => {
+      console.error("DEBUG: Voice recognition error:", event.error);
+      if (!handsFreeMode) setIsRecording(false);
+    };
+
+    recognition.onend = () => {
+      console.log("DEBUG: Voice recording ended");
+      if (isHandsFree) {
+        // Restart listening automatically in hands-free mode
+        try { recognition.start(); } catch(e) {}
+      } else {
+        setIsRecording(false);
+      }
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  };
+
+  const toggleHandsFree = () => {
+    const newMode = !isHandsFree;
+    setIsHandsFree(newMode);
+    if (newMode) {
+      setInputType('voice');
+      handleVoiceInput(true);
+    } else {
+      if (recognitionRef.current) recognitionRef.current.stop();
+      setIsRecording(false);
+      setIsNovaActive(false);
     }
   };
 
@@ -182,23 +226,69 @@ const InputHub = ({ onProcessed }) => {
 
   return (
     <div style={{ maxWidth: '896px', margin: '0 auto', width: '100%' }}>
+      <style>{`
+        @keyframes pulse {
+          0% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.7; transform: scale(0.98); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+      `}</style>
       <div style={glassCardStyle}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '20px' }}>
-          {tabs.map((tab) => (
-            <button 
-              key={tab.id}
-              onClick={() => {
-                setInputType(tab.id);
-                if (tab.id === 'voice') handleVoiceInput();
-              }}
-              style={tabButtonStyle(inputType === tab.id, tab.id === 'voice' && isRecording)}
-            >
-              {tab.id === 'voice' && isRecording ? 'Recording...' : tab.label}
-            </button>
-          ))}
+        <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '20px', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            {tabs.map((tab) => (
+              <button 
+                key={tab.id}
+                onClick={() => {
+                  setInputType(tab.id);
+                  if (tab.id === 'voice') handleVoiceInput();
+                }}
+                style={tabButtonStyle(inputType === tab.id, tab.id === 'voice' && isRecording)}
+              >
+                {tab.id === 'voice' && isRecording ? 'Recording...' : tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Hands-Free Mode Toggle */}
+          <button 
+            onClick={toggleHandsFree}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '20px',
+              fontSize: '12px',
+              fontWeight: 'bold',
+              border: 'none',
+              cursor: 'pointer',
+              backgroundColor: isHandsFree ? '#34D399' : '#4B5563',
+              color: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.3s ease',
+              boxShadow: isHandsFree ? '0 0 15px rgba(52, 211, 153, 0.4)' : 'none'
+            }}
+          >
+            {isHandsFree ? '🟢 Nova Assistant: ON' : '⚪ Nova Assistant: OFF'}
+          </button>
         </div>
 
         <div style={{ marginTop: '24px' }}>
+          {isHandsFree && (
+            <div style={{ 
+              backgroundColor: 'rgba(52, 211, 153, 0.1)', 
+              padding: '12px', 
+              borderRadius: '12px', 
+              marginBottom: '16px',
+              border: '1px solid rgba(52, 211, 153, 0.2)',
+              fontSize: '13px',
+              color: '#34D399',
+              textAlign: 'center',
+              animation: 'pulse 2s infinite'
+            }}>
+              {isNovaActive ? '📢 Nova is listening to your command...' : '🎙️ Say "Hey Nova" followed by your task'}
+            </div>
+          )}
           {(inputType === 'text' || inputType === 'voice') && (
             <textarea
               value={content}
