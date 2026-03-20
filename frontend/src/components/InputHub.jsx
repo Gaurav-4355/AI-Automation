@@ -123,42 +123,44 @@ const InputHub = ({ onProcessed }) => {
   const glassCardStyle = {
     backgroundColor: '#1E1F3A',
     borderRadius: '24px',
-    padding: '32px',
+    padding: '20px', // Reduced padding for mobile
     border: '1px solid rgba(255,255,255,0.1)',
     boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
   };
 
   const tabButtonStyle = (isActive, isRec) => ({
-    padding: '10px 20px',
-    borderRadius: '12px',
-    fontSize: '14px',
+    padding: '8px 16px', // Slightly smaller
+    borderRadius: '10px',
+    fontSize: '13px',
     fontWeight: '600',
     border: 'none',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
     backgroundColor: isRec ? '#EF4444' : (isActive ? '#7C3AED' : 'rgba(255,255,255,0.05)'),
     color: isActive || isRec ? 'white' : '#9CA3AF',
-    marginRight: '8px'
+    marginRight: '8px',
+    marginBottom: '8px' // Added for wrapping
   });
 
   const textAreaStyle = {
     width: '100%',
-    height: '256px',
-    padding: '24px',
+    height: '200px', // Slightly shorter for mobile
+    padding: '16px',
     backgroundColor: 'rgba(255,255,255,0.05)',
     border: '1px solid rgba(255,255,255,0.1)',
     borderRadius: '16px',
     outline: 'none',
     resize: 'none',
-    fontSize: '18px',
+    fontSize: '16px',
     color: 'white',
-    fontFamily: 'inherit'
+    fontFamily: 'inherit',
+    boxSizing: 'border-box' // Important for width calculation
   };
 
   const uploadBoxStyle = {
     border: '2px dashed rgba(255,255,255,0.1)',
     borderRadius: '24px',
-    padding: '80px 20px',
+    padding: '40px 10px', // Much smaller for mobile
     textAlign: 'center',
     cursor: 'pointer',
     backgroundColor: 'rgba(255,255,255,0.02)'
@@ -166,22 +168,22 @@ const InputHub = ({ onProcessed }) => {
 
   const submitButtonStyle = {
     width: '100%',
-    padding: '16px',
+    padding: '14px',
     borderRadius: '16px',
     backgroundColor: '#7C3AED',
     color: 'white',
     fontWeight: 'bold',
-    fontSize: '18px',
+    fontSize: '16px',
     border: 'none',
     cursor: (isProcessing || (!content && !file)) ? 'not-allowed' : 'pointer',
     opacity: (isProcessing || (!content && !file)) ? 0.5 : 1,
-    marginTop: '24px'
+    marginTop: '20px'
   };
 
   return (
-    <div style={{ maxWidth: '896px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '896px', margin: '0 auto', width: '100%' }}>
       <div style={glassCardStyle}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '32px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '20px' }}>
           {tabs.map((tab) => (
             <button 
               key={tab.id}

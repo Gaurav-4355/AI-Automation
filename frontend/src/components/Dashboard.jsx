@@ -211,7 +211,7 @@ const Dashboard = () => {
     backgroundColor: '#0D0E1A',
     color: 'white',
     minHeight: '100vh',
-    padding: '20px',
+    padding: '10px 10px 40px 10px',
     fontFamily: 'sans-serif'
   };
 
@@ -219,19 +219,21 @@ const Dashboard = () => {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '30px'
+    marginBottom: '20px',
+    flexWrap: 'wrap',
+    gap: '10px'
   };
 
   const statCardContainerStyle = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '20px',
-    marginBottom: '40px'
+    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+    gap: '12px',
+    marginBottom: '30px'
   };
 
   const statCardStyle = {
     backgroundColor: '#1E1F3A',
-    padding: '20px',
+    padding: '15px 10px',
     borderRadius: '15px',
     border: '1px solid rgba(255,255,255,0.1)',
     textAlign: 'center'
@@ -239,19 +241,23 @@ const Dashboard = () => {
 
   const accentTextStyle = {
     color: '#7C3AED',
-    fontSize: '32px',
+    fontSize: '24px',
     fontWeight: 'bold',
-    margin: '10px 0'
+    margin: '5px 0'
   };
 
   const refreshButtonStyle = {
     backgroundColor: '#7C3AED',
     color: 'white',
     border: 'none',
-    padding: '10px 20px',
+    padding: '8px 16px',
     borderRadius: '8px',
     cursor: 'pointer',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    fontSize: '14px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px'
   };
 
   return (
