@@ -6,13 +6,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Use DATABASE_URL from environment variable (Supabase/Postgres) or fallback to SQLite
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./novamind.db").strip()
+# Use DATABASE_URL from environment variable or fallback to SQLite
+raw_url = os.getenv("DATABASE_URL")
+if raw_url:
+    SQLALCHEMY_DATABASE_URL = raw_url.strip().replace('"', '').replace("'", "").replace('[', '').replace(']', '')
+else:
+    SQLALCHEMY_DATABASE_URL = "sqlite:///./novamind.db"
 
-# Remove any accidental quotes or brackets that might have been pasted
-SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace('"', '').replace("'", "").replace('[', '').replace(']', '')
-
-# If using Postgres, adjust the URL for SQLAlchemy if needed (Render/Supabase)
+# Fix for SQLAlchemy (Postgres vs PostgreSQL)
 if SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
     SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
