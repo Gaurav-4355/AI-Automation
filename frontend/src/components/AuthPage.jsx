@@ -5,8 +5,10 @@ import axios from 'axios';
 
 const getApiBaseUrl = () => {
   const { hostname } = window.location;
-  const targetHost = hostname === 'localhost' ? '127.0.0.1' : hostname;
-  return `http://${targetHost}:8000/api`;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return `http://127.0.0.1:8000/api`;
+  }
+  return `https://sgu-7mjn.onrender.com/api`; 
 };
 
 const API_BASE_URL = getApiBaseUrl();
