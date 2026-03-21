@@ -15,6 +15,7 @@ import models, schemas, database
 from services.ai_service import AIService
 from services.ocr_service import OCRService
 from services.pdf_service import PDFService
+import sqlalchemy
 
 # Dependency for DB Session
 def get_db():
