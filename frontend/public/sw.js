@@ -1,5 +1,11 @@
 // Service Worker for background notifications and interactive actions
-const API_BASE_URL = 'http://localhost:8000/api';
+const getApiBaseUrl = () => {
+  const hostname = self.location.hostname;
+  const targetHost = hostname === 'localhost' ? '127.0.0.1' : hostname;
+  return `http://${targetHost}:8000/api`;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 self.addEventListener('push', (event) => {
   // Logic for push notifications (if we use a push service later)

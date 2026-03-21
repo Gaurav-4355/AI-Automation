@@ -1,6 +1,6 @@
 import React from 'react';
 
-const TaskList = ({ tasks, onToggleStatus, onDelete, onTaskClick, highlightedTaskId }) => {
+const TaskList = ({ tasks, onToggleStatus, onDelete, onTaskClick, highlightedTaskId, currentUser }) => {
   const [expandedInsights, setExpandedInsights] = React.useState({});
 
   if (!tasks || tasks.length === 0) {
@@ -109,6 +109,16 @@ const TaskList = ({ tasks, onToggleStatus, onDelete, onTaskClick, highlightedTas
           <div style={{ flex: 1, marginRight: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px', gap: '8px' }}>
               {!isSubTask && <div style={badgeStyle(task.priority)}>{task.priority}</div>}
+              {task.category && !isSubTask && (
+                <div style={{ ...badgeStyle('medium'), backgroundColor: 'rgba(52, 211, 153, 0.1)', color: '#34D399' }}>
+                  {task.category}
+                </div>
+              )}
+              {currentUser.role === 'admin' && !isSubTask && (
+                <div style={{ ...badgeStyle('low'), backgroundColor: task.is_personal ? 'rgba(236, 72, 153, 0.1)' : 'rgba(96, 165, 250, 0.1)', color: task.is_personal ? '#EC4899' : '#60A5FA' }}>
+                  {task.is_personal ? 'Personal' : 'Team'}
+                </div>
+              )}
               {isSubTask && <span style={{ color: '#7C3AED', fontWeight: 'bold', fontSize: '12px' }}>{index + 1}.</span>}
               {!isSubTask && (
                 <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#7C3AED', textTransform: 'uppercase', backgroundColor: 'rgba(124, 58, 237, 0.1)', padding: '2px 6px', borderRadius: '4px' }}>
@@ -148,7 +158,7 @@ const TaskList = ({ tasks, onToggleStatus, onDelete, onTaskClick, highlightedTas
             >
               {task.status === 'completed' ? 'Done' : 'Mark Complete'}
             </button>
-            {!isSubTask && (
+            {!isSubTask && currentUser?.role !== 'user' && (
               <button 
                 style={{ ...deleteButtonStyle, padding: '8px 15px' }} 
                 onClick={(e) => { e.stopPropagation(); onDelete && onDelete(task.id); }}
