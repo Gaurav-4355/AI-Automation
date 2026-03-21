@@ -11,10 +11,10 @@ import asyncio
 from passlib.context import CryptContext
 from fastapi import Header
 
-import models, schemas, database
-from services.ai_service import AIService
-from services.ocr_service import OCRService
-from services.pdf_service import PDFService
+from backend import models, schemas, database
+from backend.services.ai_service import AIService
+from backend.services.ocr_service import OCRService
+from backend.services.pdf_service import PDFService
 
 # Dependency for DB Session
 def get_db():
