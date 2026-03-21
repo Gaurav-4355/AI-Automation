@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+sqlalchemy
+groq
+python-multipart
+pydantic-settings
+pillow
+python-dotenv
+pypdf
+alembic
+cors
+passlib
+bcrypt
+psycopg2-binary
