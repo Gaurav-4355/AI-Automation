@@ -11,9 +11,9 @@ const getApiBaseUrl = () => {
     return `http://127.0.0.1:8000/api`;
   }
   // For production (Render/Vercel), use the backend URL from environment or logic
-  // Update this to your Render URL after deployment
-  return `https://sguhackathon-backend.onrender.com/api`; 
-};
+   // Update this to your Render URL after deployment
+   return `https://sgu-7mjn.onrender.com/api`; 
+ };
 
 const API_BASE_URL = getApiBaseUrl();
 
