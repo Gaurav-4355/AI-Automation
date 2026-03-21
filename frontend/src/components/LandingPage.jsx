@@ -97,10 +97,15 @@ const LandingPage = () => {
         animate={{ y: 0, opacity: 1 }}
         style={{ textAlign: 'center', marginBottom: '60px', zIndex: 10 }}
       >
-        <h1 style={{ fontSize: '48px', fontWeight: '900', marginBottom: '10px', background: 'linear-gradient(to right, #7C3AED, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          NovaMind AI
-        </h1>
-        <p style={{ color: '#9CA3AF', fontSize: '18px' }}>The Future of Cognitive Workflow Automation</p>
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          <h1 style={{ fontSize: '48px', fontWeight: '900', marginBottom: '10px', background: 'linear-gradient(to right, #7C3AED, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            NovaMind
+          </h1>
+          <div style={{ position: 'absolute', bottom: '-8px', right: '0', fontSize: '12px', fontWeight: '900', color: '#7C3AED', letterSpacing: '2px', textTransform: 'uppercase', opacity: 0.8 }}>Made with TRAE</div>
+        </div>
+        <p style={{ fontSize: '18px', color: '#9CA3AF', maxWidth: '600px', margin: '0 auto' }}>
+          Your intelligent co-pilot for cognitive workflow and seamless productivity.
+        </p>
       </motion.div>
 
       <div style={gridStyle}>

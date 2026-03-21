@@ -226,7 +226,10 @@ const Dashboard = () => {
     <div style={{ padding: '20px', maxWidth: '100%', margin: '0 auto', color: 'white', minHeight: '100vh', position: 'relative', overflowX: 'hidden' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap', gap: '15px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <h1 style={{ fontSize: '28px', fontWeight: '800', margin: 0, background: 'linear-gradient(to right, #7C3AED, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', cursor: 'pointer' }} onClick={() => window.location.href = '/'}>NovaMind</h1>
+          <div style={{ position: 'relative' }}>
+            <h1 style={{ fontSize: '28px', fontWeight: '800', margin: 0, background: 'linear-gradient(to right, #7C3AED, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', cursor: 'pointer' }} onClick={() => window.location.href = '/'}>NovaMind</h1>
+            <div style={{ position: 'absolute', bottom: '-12px', left: '0', fontSize: '8px', fontWeight: '900', color: '#7C3AED', letterSpacing: '1px', textTransform: 'uppercase', opacity: 0.8 }}>Made with TRAE</div>
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,255,255,0.05)', padding: '6px 15px', borderRadius: '25px', border: '1px solid rgba(255,255,255,0.1)' }}>
             <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: currentUser.role === 'admin' ? '#7C3AED' : (currentUser.role === 'user' ? '#34D399' : '#EC4899'), boxShadow: '0 0 10px currentColor' }}></div>
             <span style={{ fontSize: '13px', fontWeight: '800', color: 'white' }}>
